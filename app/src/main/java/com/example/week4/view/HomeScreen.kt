@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
@@ -18,16 +19,17 @@ import com.example.week4.viewmodel.TaskViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    taskViewModel: TaskViewModel,
+    viewModel: TaskViewModel,
     onTaskClick: (Int) -> Unit = {},
     onAddClick: () -> Unit = {},
-    onNavigateCalendar: () -> Unit = {}
+    onNavigateCalendar: () -> Unit = {},
+    onNavigateSettings: () -> Unit = {}
 ) {
-    val uiState by taskViewModel.uiState.collectAsState()
-    val selectedTask by taskViewModel.selectedTask.collectAsState()
-    val addTaskFlag by taskViewModel.addTaskDialogVisible.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
+    val selectedTask by viewModel.selectedTask.collectAsState()
+    val addTaskFlag by viewModel.addTaskDialogVisible.collectAsState()
     val tasks = remember(uiState.tasks, uiState.filter) {
-        taskViewModel.filteredTasks()
+        viewModel.filteredTasks()
     }
 
     Scaffold { paddingValues ->
@@ -46,6 +48,12 @@ fun HomeScreen(
                             contentDescription = "Go to calendar"
                         )
                     }
+                    IconButton(onClick = onNavigateSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Go to settings"
+                        )
+                    }
                 }
             )
             // Painikkeet
@@ -59,12 +67,12 @@ fun HomeScreen(
                 TaskFilter.entries.forEach { filter ->
                     FilterChip(
                         selected = uiState.filter == filter,
-                        onClick = { taskViewModel.setFilter(filter) },
+                        onClick = { viewModel.setFilter(filter) },
                         label = { Text(filter.name) }
                     )
                 }
                 // Järjestä
-                Button(onClick = { taskViewModel.sortByDueDate() }) {
+                Button(onClick = { viewModel.sortByDueDate() }) {
                     Text("Sort")
                 }
             }
@@ -81,8 +89,8 @@ fun HomeScreen(
                     TaskCard(
                         task = item,
                         onClick = { onTaskClick(item.id)},
-                        onToggle = { taskViewModel.toggleDone(item.id) },
-                        onDelete = { taskViewModel.removeTask(item.id) }
+                        onToggle = { viewModel.toggleDone(item.id) },
+                        onDelete = { viewModel.removeTask(item.id) }
                     )
                 }
             }
@@ -90,16 +98,16 @@ fun HomeScreen(
             if (selectedTask != null) {
                 DetailDialog(
                     task = selectedTask!!, // Pakota non-null, voi crashata jos onkin null
-                    onClose = { taskViewModel.closeDialog() },
-                    onUpdate = { taskViewModel.updateTask(it) },
-                    onDelete = { taskViewModel.removeTask(it.id)}
+                    onClose = { viewModel.closeDialog() },
+                    onUpdate = { viewModel.updateTask(it) },
+                    onDelete = { viewModel.removeTask(it.id)}
                 )
             }
             // Näytä AddDialog, jos addTaskFlag = true
             if (addTaskFlag) {
                 AddDialog(
-                    onClose = { taskViewModel.addTaskDialogVisible.value = false },
-                    onAdd = { taskViewModel.addTask(it) }
+                    onClose = { viewModel.addTaskDialogVisible.value = false },
+                    onAdd = { viewModel.addTask(it) }
                 )
             }
         }

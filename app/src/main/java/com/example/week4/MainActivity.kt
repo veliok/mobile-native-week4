@@ -11,7 +11,9 @@ import androidx.navigation.compose.composable
 import com.example.week4.view.HomeScreen
 import com.example.week4.navigation.ROUTE_CALENDAR
 import com.example.week4.navigation.ROUTE_HOME
+import com.example.week4.navigation.ROUTE_SETTINGS
 import com.example.week4.view.CalendarScreen
+import com.example.week4.view.SettingsScreen
 import com.example.week4.viewmodel.TaskViewModel
 
 class MainActivity : ComponentActivity() {
@@ -28,7 +30,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 composable(ROUTE_HOME) {
                     HomeScreen(
-                        taskViewModel = viewModel,
+                        viewModel = viewModel,
                         onTaskClick = { id ->
                             viewModel.openTask(id)
                         },
@@ -37,6 +39,9 @@ class MainActivity : ComponentActivity() {
                         },
                         onNavigateCalendar = {
                             navController.navigate(ROUTE_CALENDAR)
+                        },
+                        onNavigateSettings = {
+                            navController.navigate(ROUTE_SETTINGS)
                         }
                     )
                 }
@@ -47,7 +52,14 @@ class MainActivity : ComponentActivity() {
                             viewModel.openTask(id)
                         },
                         onNavigateHome = {
-                            navController.navigate(ROUTE_HOME)
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(ROUTE_SETTINGS) {
+                    SettingsScreen(
+                        onNavigateHome = {
+                            navController.popBackStack()
                         }
                     )
                 }
